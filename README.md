@@ -1,2 +1,2 @@
-# nfl-player-compare
-A tool for comparing NFL player statistics and performance.
+# NFL-player-compare
+A web application for comparing NFL players using statistics and performance data.
