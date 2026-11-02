@@ -1,160 +1,121 @@
-# NFL-player-compare
-A web application for comparing NFL players using statistics and performance data.
-## Visual Player Comparison
-
-Below is a sample output comparing **Patrick Mahomes** and **Brock Purdy** using normalized Z-scores across core QB factors:
-
-![Player Comparison Chart](player_comparison.png)
-
-
-[nfl_player_comparison_ranking_tool.md](https://github.com/user-attachments/files/34249619/nfl_player_comparison_ranking_tool.md)
 # NFL Player Comparison & Ranking Tool
 
-An interactive, multi-position NFL player evaluation tool built with Python, `pandas`, `nflreadpy`, and `matplotlib`. This application enables user-defined metric weighting, standardized Z-score performance indexing, dynamic position filtering, fuzzy player searching, and side-by-side visual analytics.
+A modular terminal application that processes season-long NFL data to rank and compare offensive skill players (QBs, RBs, WRs, TEs) using a custom Z-score statistical methodology.
 
 ---
 
-## Table of Contents
-- [Overview](#overview)
-- [Key Features](#key-features)
-- [Statistical Formula & Methodology](#statistical-formula--methodology)
-- [Installation & Requirements](#installation--requirements)
-- [Usage Guide](#usage-guide)
-- [Visualizations](#visualizations)
-- [Development Iterations & Changelog](#development-iterations--changelog)
+## Installation
 
----
-
-## Overview
-
-Traditional NFL statistics often evaluate players using single raw volume metrics (e.g., total passing yards) or raw averages that fail to account for context, sample size, or turnover penalties. This tool normalizes metrics across positions using **Z-scores** derived from 2023 regular-season data loaded via `nflreadpy`. It allows users to rank Quarterbacks (QB), Running Backs (RB), Wide Receivers (WR), and Tight Ends (TE) using balanced default formulas or custom-weighted criteria.
-
----
-
-## Key Features
-
-* **Multi-Position Normalization:** Evaluates QBs, RBs, WRs, and TEs using position-tailored factor dictionaries and minimum play thresholds.
-* **Fuzzy & Robust Name Search:** Handles input typos (e.g., `"jaylen hurts"` $\rightarrow$ `"Jalen Hurts"`) and punctuation variations (e.g., `"tj watt"` $\rightarrow$ `"T.J. Watt"`) using string cleaning and `difflib`.
-* **Interactive Preset & Custom Weighting:** Switch between Volume-heavy, Efficiency-heavy, Balanced, or fully customized metric weights (1–5 scale) with built-in overlap warnings.
-* **Turnover Penalty Directionality:** Automatically flips negative indicators (Interceptions, Fumbles Lost) so higher raw totals reduce composite rankings.
-* **Comparative Matplotlib Visualizations:** Generates grouped bar charts comparing player Z-scores directly against peers or position baselines.
-
----
-
-## Statistical Formula & Methodology
-
-### 1. Z-Score Standardization
-To compare disparate metrics (such as Passing EPA/play vs. Total Passing Yards) on an identical scale, raw stats ($X$) are transformed into standard deviation units ($Z$):
-
-$$Z = \left(\frac{X - \mu}{\sigma}\right) \times D$$
-
-Where:
-* $X$ = Player's raw stat
-* $\mu$ = Qualified position mean
-* $\sigma$ = Qualified position standard deviation
-* $D$ = Direction multiplier ($+1.0$ for positive metrics, $-1.0$ for negative metrics like INTs or Fumbles)
-
-### 2. Weighted Composite Index
-Player rankings are generated using the weighted mean of individual metric Z-scores:
-
-$$\text{Composite Score} = \frac{\sum (Z_i \times w_i)}{\sum w_i}$$
-
-Where $Z_i$ is the standardized metric score and $w_i$ is the assigned weight ($1 \le w_i \le 5$).
-
-### 3. Position Cutoffs & Factor Mappings
-
-| Position | Minimum Threshold | Included Metrics | Metric Direction |
-| :--- | :--- | :--- | :--- |
-| **QB** | $\ge 200$ Attempts | Passing Yards, Passing TDs, Passing EPA, Interceptions | INTs: Negative ($-1.0$) |
-| **RB** | $\ge 75$ Carries | Rushing Yards, Rushing TDs, Rushing EPA, Yards/Carry, Fumbles Lost | Fumbles: Negative ($-1.0$) |
-| **WR** | $\ge 40$ Targets | Receiving Yards, Receptions, Receiving TDs, Receiving EPA, Yards/Rec | All Positive ($+1.0$) |
-| **TE** | $\ge 40$ Targets | Receiving Yards, Receptions, Receiving TDs, Receiving EPA, Yards/Rec | All Positive ($+1.0$) |
-
----
-
-## Installation & Requirements
-
-### Prerequisites
-* Python 3.9 or higher
-
-### Required Dependencies
-Install the necessary libraries via `pip`:
+Ensure you have Python 3.8+ installed, then install the required dependencies:
 
 ```bash
 pip install pandas numpy nflreadpy matplotlib
+
 ```
 
 ---
 
-## Usage Guide
+## Features
 
-### 1. Interactive Search
-Run the robust player search interface:
-
-```bash
-python3 search.py
-```
-
-### 2. Custom QB Weighting Engine
-Run the custom weighting menu:
-
-```bash
-python3 rankings_v4.py
-```
-
-### 3. Multi-Position Rankings
-Generate rankings across QB, RB, WR, and TE:
-
-```bash
-python3 multi_position_rankings.py
-```
-
-### 4. Comparison Chart Generator
-Create Z-score comparison charts:
-
-```bash
-python3 charts.py
-```
+* **Memory-Cached Data Loading:** Downloads and parses 2023 NFL data using `nflreadpy` once at startup to optimize performance across all operations.
+* **Robust Player Search:** Supports exact full-name matches, unique last-name searches, and fuzzy string matching (with auto-correction for common typos).
+* **Position-Specific Z-Score Engine:** Ranks players within their position using weighted statistical factors (e.g., passing yards, passing TDs, passing EPA, and interceptions for QBs).
+* **Sample-Size Thresholds:** Filters out backup players using position-specific volume cutoffs (e.g., minimum 200 pass attempts for QBs).
+* **Side-by-Side Visual Comparisons:** Generates matplotlib bar charts comparing two qualified players across their position's core metrics.
+* **Interactive Terminal Workflow:** An intuitive CLI menu that unifies data processing, searching, ranking, and charting.
 
 ---
 
-## Visualizations
+## Positional Cutoffs & Metric Factors
 
-### Visual Player Comparison Chart
-The tool generates standardized Z-score visual charts comparing player stats without scale distortion:
-
-![Player Comparison Chart](player_comparison.png)
-
-*Figure 1: Standardized Z-Score Comparison between Patrick Mahomes and Brock Purdy (2023 Season).*
+| Position | Minimum Cutoff | Evaluated Metric Factors & Directions |
+| --- | --- | --- |
+| **QB** | 200 pass attempts | Passing Yards (1.0), Passing TDs (1.0), Passing EPA (1.0), Interceptions (-1.0) |
+| **RB** | 75 rush attempts | Rushing Yards (1.0), Rushing TDs (1.0), Rushing EPA (1.0), Yards/Carry (1.0), Fumbles Lost (-1.0) |
+| **WR** | 40 targets | Receiving Yards (1.0), Receptions (1.0), Receiving TDs (1.0), Receiving EPA (1.0), Yards/Reception (1.0) |
+| **TE** | 40 targets | Receiving Yards (1.0), Receptions (1.0), Receiving TDs (1.0), Receiving EPA (1.0), Yards/Reception (1.0) |
 
 ---
 
-## Development Iterations & Changelog
+## Statistical Methodology
 
-### Phase 1–2: Data Pipeline & Search Mechanics
-* Integrated `nflreadpy` to ingest 2023 regular season stats.
-* Implemented fuzzy matching via `difflib`. 
-* **Bug Fix:** Fixed `TypeError: object of type 'float' has no len()` caused by `NaN` values in `nflreadpy` string columns by applying `.dropna()` and explicit type filtering.
-* **Regex Enhancement:** Built `clean_str()` regex pipeline to resolve punctuation matching issues (e.g., matching `"tj watt"` to `"T.J. Watt"`).
+Players are evaluated using **Z-scores** to measure how many standard deviations their performance is above or below the positional mean:
 
-### Phase 3: Z-Score Core & Model Validation
-* Built initial 4-factor QB ranking model (Yards, TDs, EPA, INTs).
-* Defended C.J. Stroud's QB3 placement based on low turnover rate (5 INTs on 499 attempts).
+$$Z = D \times \frac{x - \mu}{\sigma}$$
 
-### Phase 4: Interactive Weighting Engine
-* Added interactive CLI menu with Volume, Efficiency, and Balanced presets.
-* Implemented input validation and double-counting warnings when high weights are assigned to both aggregate volume and composite EPA.
+* **$x$**: Player's individual stat value
+* **$\mu$**: Positional average (mean)
+* **$\sigma$**: Positional standard deviation
+* **$D$**: Direction multiplier ($D = -1$ for negative metrics like interceptions and fumbles lost; $D = 1$ for all other stats)
 
-### Phase 5: Multi-Position Expansion
-* Refactored Z-score scoring pipeline into a reusable modular function (`calculate_zscore_rankings`).
-* Configured tailored factor dicts and touch thresholds for RB ($\ge 75$ carries), WR ($\ge 40$ targets), and TE ($\ge 40$ targets).
-* Validated RB efficiency outliers (De'Von Achane's 7.8 YPC) vs. full-season volume leaders (Christian McCaffrey, Raheem Mostert).
+### Composite Score Formula
 
-### Phase 6: Matplotlib Analytics Visualization
-* Developed `charts.py` to plot grouped Z-score bar graphs for visual comparison.
+Positional Z-scores are multiplied by their directional factors and averaged to determine a composite score:
+
+$$\text{Composite Score} = \frac{\sum (Z_{\text{stat}} \times D_{\text{stat}})}{\sum \vert{}D_{\text{stat}}\vert{}}$$
+
+*Note: All EPA (Expected Points Added) metrics in this tool utilize cumulative **Total EPA** for the 2023 regular season, rather than per-play averages.*
+
+---
+
 ## Usage Guide
 
 To launch the interactive CLI application:
 
 ```bash
 python3 main.py
+
+```
+
+### Individual Scripts & Standalone Tools
+
+*(Earlier versions and specialized modules)*
+
+* `multi_position_rankings.py`: Runs the core Z-score calculation engine and prints positional leaderboards across skill positions.
+* `search.py`: Handles player name normalization, fuzzy matching, and disambiguation.
+* `charts.py`: Generates individual matplotlib comparison charts.
+* `rankings.py` & `rankings_v4.py`: Earlier iterations of the ranking script. `rankings_v4.py` includes a standalone interactive menu allowing users to input custom weights specifically for QBs (note: custom weighting is currently exclusive to `rankings_v4.py` and not part of the main `main.py` CLI workflow).
+
+---
+
+## Visualizations
+
+### Example Comparison: Amon-Ra St. Brown vs. Justin Jefferson (2023 WRs)
+
+> **Analytical Note:** Season-long cumulative totals heavily favor players who appeared in all 17 games. Justin Jefferson missed 7 games in 2023 due to a hamstring injury; while his efficiency (*Yards Per Reception*) remained elite, his cumulative Z-scores reflect missed volume compared to Amon-Ra St. Brown's full-season workload.
+
+---
+
+## Technical Changelog
+
+* **Phase 1 (Data Foundation & Basic Ranking):**
+* Loaded raw 2023 season-long player stats using `nflreadpy` (`load_player_stats` with `summary_level="reg"`).
+* Calculated basic Z-scores for QBs and handled NaN values caused by missing stats.
+
+
+* **Phase 2 (Position Expansion & Weighting):**
+* Defined `POSITION_CONFIGS` for QBs, RBs, WRs, and TEs with position-specific metrics and minimum volume thresholds.
+* Implemented directional multipliers ($D = -1$) for negative metrics (interceptions, fumbles).
+
+
+* **Phase 3 (Fuzzy Search & Punctuation Handling):**
+* Built `search.py` using `difflib` to auto-correct typos (e.g., auto-correcting `Amon Ra St brown` to `Amon-Ra St. Brown`).
+* Added multi-player selection menus when input searches match multiple players.
+
+
+* **Phase 4 (Validation & Verification):**
+* Verified sample-size filtering against real-world edge cases (e.g., C.J. Stroud's rookie season qualifications and De'Von Achane's high-efficiency, limited-volume RB campaign).
+
+
+* **Phase 5 (Visualizations):**
+* Created `charts.py` using `matplotlib` to plot side-by-side Z-score profiles for two players sharing the same position.
+
+
+* **Phase 6 (Refactoring & Decoupling):**
+* Modularized codebase to prevent redundant dataset re-downloads across functions.
+
+
+* **Phase 7 (Application Orchestration & Polish):**
+* Built `main.py` entry point to connect memory-cached data loading, player search, ranking outputs, and side-by-side charting in a single CLI loop.
+* **Bug Fix:** Fixed volume qualification logic in `get_player_qualification_info()`. The initial fix attempted to parse `min_` keys dynamically and defaulted to checking 0, but the function was successfully updated to read `cutoff_col` and `min_cutoff` directly from `POSITION_CONFIGS` (verified with backup QB Blaine Gabbert's 35 pass attempts).
+* **Analytical Insight:** Documented the impact of missed games on cumulative season totals using the Amon-Ra St. Brown vs. Justin Jefferson comparison.
