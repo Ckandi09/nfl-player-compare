@@ -83,6 +83,7 @@ python3 main.py
 ### Example Comparison: Amon-Ra St. Brown vs. Justin Jefferson (2023 WRs)
 
 > **Analytical Note:** Season-long cumulative totals heavily favor players who appeared in all 17 games. Justin Jefferson missed 7 games in 2023 due to a hamstring injury; while his efficiency (*Yards Per Reception*) remained elite, his cumulative Z-scores reflect missed volume compared to Amon-Ra St. Brown's full-season workload.
+> ![Amon-Ra St. Brown vs. Justin Jefferson](player_comparison.png)
 
 ---
 
