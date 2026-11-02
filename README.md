@@ -152,3 +152,9 @@ The tool generates standardized Z-score visual charts comparing player stats wit
 
 ### Phase 6: Matplotlib Analytics Visualization
 * Developed `charts.py` to plot grouped Z-score bar graphs for visual comparison.
+## Usage Guide
+
+To launch the interactive CLI application:
+
+```bash
+python3 main.py
